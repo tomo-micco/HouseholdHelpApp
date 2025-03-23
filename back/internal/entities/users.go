@@ -15,10 +15,10 @@ func (p Password) GoString() string {
 
 // ユーザー
 type User struct {
-	Id       uint32
-	Name     string
-	Email    string
-	Password Password
+	Id       uint32   `db:"id"`
+	Name     string   `db:"name"`
+	Email    string   `db:"email"`
+	Password Password `db:"password"`
 }
 
 func NewUser() *User {

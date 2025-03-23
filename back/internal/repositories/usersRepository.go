@@ -8,18 +8,18 @@ import (
 // ユーザー操作用リポジトリインターフェース
 type UserRepo interface {
 	GetAllUsers() ([]entities.User, error)
-	GetById(id uint32) (entities.User, error)
-	CreateUser(user entities.User) error
-	UpdateUser(user entities.User) error
-	DeleteUser(id uint32) error
+	GetById(id int) (entities.User, error)
+	CreateUser(user entities.User, tx *sqlx.Tx) error
+	UpdateUser(user entities.User, tx *sqlx.Tx) error
+	DeleteUser(id int, tx *sqlx.Tx) error
 }
 
 type UsersRepository struct {
-	db sqlx.DB
+	db *sqlx.DB
 }
 
 // コンストラクタ
-func NewUsersRepository(db sqlx.DB) *UsersRepository {
+func NewUsersRepository(db *sqlx.DB) *UsersRepository {
 	return &UsersRepository{db}
 }
 
@@ -31,26 +31,26 @@ func (u *UsersRepository) GetAllUsers() ([]entities.User, error) {
 }
 
 // ユーザー取得
-func (u *UsersRepository) GetById(id uint32) (entities.User, error) {
+func (u *UsersRepository) GetById(id int) (entities.User, error) {
 	user := entities.User{}
 	err := u.db.Get(&user, "SELECT * FROM users WHERE id = $1", id)
 	return user, err
 }
 
 // ユーザー作成
-func (u *UsersRepository) CreateUser(user entities.User) error {
-	_, err := u.db.NamedExec("INSERT INTO users (name, email, password) VALUES (:name, :email, :password)", user)
+func (u *UsersRepository) CreateUser(user entities.User, tx *sqlx.Tx) error {
+	_, err := tx.NamedExec("INSERT INTO users (name, email, password) VALUES (:name, :email, :password)", user)
 	return err
 }
 
 // ユーザー更新
-func (u *UsersRepository) UpdateUser(user entities.User) error {
-	_, err := u.db.NamedExec("UPDATE users SET name = :name, email = :email, password = :password WHERE id = :id", user)
+func (u *UsersRepository) UpdateUser(user entities.User, tx *sqlx.Tx) error {
+	_, err := tx.NamedExec("UPDATE users SET name = :name, email = :email, password = :password WHERE id = :id", user)
 	return err
 }
 
 // ユーザー削除
-func (u *UsersRepository) DeleteUser(id uint32) error {
-	_, err := u.db.Exec("DELETE FROM users WHERE id = $1", id)
+func (u *UsersRepository) DeleteUser(id int, tx *sqlx.Tx) error {
+	_, err := tx.Exec("DELETE FROM users WHERE id = $1", id)
 	return err
 }
