@@ -33,7 +33,7 @@ func (u *UsersRepository) GetAllUsers() ([]entities.User, error) {
 // ユーザー取得
 func (u *UsersRepository) GetById(id int) (entities.User, error) {
 	user := entities.User{}
-	err := u.db.Get(&user, "SELECT * FROM users WHERE id = $1", id)
+	err := u.db.Get(&user, "SELECT * FROM users WHERE id = ?", id)
 	return user, err
 }
 
@@ -51,6 +51,6 @@ func (u *UsersRepository) UpdateUser(user entities.User, tx *sqlx.Tx) error {
 
 // ユーザー削除
 func (u *UsersRepository) DeleteUser(id int, tx *sqlx.Tx) error {
-	_, err := tx.Exec("DELETE FROM users WHERE id = $1", id)
+	_, err := tx.Exec("DELETE FROM users WHERE id = ?", id)
 	return err
 }
